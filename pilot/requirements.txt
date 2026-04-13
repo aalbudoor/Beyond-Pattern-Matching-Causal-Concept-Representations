@@ -7,3 +7,5 @@ lightgbm>=4.3
 econml>=0.15
 tqdm>=4.66
 pyarrow>=15.0
+matplotlib>=3.8
+seaborn>=0.13

@@ -1,54 +1,40 @@
-\documentclass[11pt]{article}
-\usepackage[margin=0.5in, top=0.4in, bottom=0.6in]{geometry}
-\usepackage{amsmath, amssymb}
-\usepackage{graphicx}
+\documentclass{article}
+
+\PassOptionsToPackage{numbers,compress}{natbib}
+\usepackage[preprint]{neurips_2026}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage{hyperref}
+\usepackage{url}
 \usepackage{booktabs}
-\usepackage{parskip}
-\usepackage{titlesec}
+\usepackage{amsfonts}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
 \usepackage{enumitem}
-\usepackage[numbers]{natbib}
 \usepackage{tikz}
 \usetikzlibrary{positioning}
 
-% Reduce spacing around sections and subsections
-\titlespacing*{\section}{0pt}{4pt}{2pt}
-\titlespacing*{\subsection}{0pt}{3pt}{1pt}
+\title{Beyond Pattern Matching: Causal Concept Representations for Strategic Decision-Making in Chess}
 
-% Reduce spacing for list environments globally
-\setlist{nosep, topsep=0pt, partopsep=0pt, parsep=0pt, itemsep=0pt}
-
-% Reduce spacing between paragraphs
-\setlength{\parskip}{2pt}
-
-\hypersetup{
-colorlinks=true,
-linkcolor=black,
-citecolor=black,
-urlcolor=black
+\author{%
+  Abdulla Alfalasi \\
+  ML808 --- Causality \& Machine Learning \\
+  Mohamed Bin Zayed University of AI
+  \And
+  Mohammmed AlBalooshi \\
+  ML808 --- Causality \& Machine Learning \\
+  Mohamed Bin Zayed University of AI
 }
-
-\title{
-\vspace{-2.5em}
-\textbf{Beyond Pattern Matching: Causal Concept Representations for Strategic Decision-Making in Chess}
-\vspace{-1em}
-}
-
-\author{
-Abdulla Alfalasi \quad Mohammmed AlBalooshi \\
-\small ML808 --- Causality \& Machine Learning \\
-\small Mohamed Bin Zayed University of AI
-}
-
-\date{Submitted: 27 March 2026}
 
 \begin{document}
-\maketitle
-\vspace{-2.5em}
 
-% -------------------------------------------------------
-\section*{Abstract}
-% -------------------------------------------------------
+\maketitle
+
+\begin{abstract}
 
 We introduce \textsc{ChessCausalBench}, a controlled testbed for evaluating causal
 representation learning in strategic decision-making. Given a fixed structural causal
@@ -62,9 +48,10 @@ dominate at small $N$ and moderate-to-high confounding, while learned deconfound
 representations close the gap at large $N$. A minimal theoretical result in a
 linear-Gaussian SCM formalizes the variance-reduction benefit of low-dimensional
 sufficient encodings and anchors the empirical findings.
+\end{abstract}
 
 % -------------------------------------------------------
-\section*{Key Project Idea}
+\section{Key Project Idea}
 % -------------------------------------------------------
 
 We introduce a principled testbed for evaluating causal representations in
@@ -98,7 +85,7 @@ evaluated under varying confounding strength $\gamma$ and noise level $\alpha$,
 yielding a regime map of when each representation is preferable.
 
 % -------------------------------------------------------
-\section*{Causal Perspective}
+\section{Causal Perspective}
 % -------------------------------------------------------
 
 We frame the problem in terms of interventional queries rather than observational
@@ -139,7 +126,7 @@ information-bottleneck and deconfounding approaches to treatment-effect
 estimation.\cite{kuang2020information,deconfoundingScores}
 
 % -------------------------------------------------------
-\section*{Motivations}
+\section{Motivations}
 % -------------------------------------------------------
 
 Modern AI systems often rely on large-scale statistical pattern matching, which
@@ -186,7 +173,7 @@ representation $X_{\text{SCBM}} = (h_\theta(S), X)$ evaluated on Tasks T1--T3
 identically to our three representations; we leave this comparison to future work.
 
 % -------------------------------------------------------
-\section*{Contributions}
+\section{Contributions}
 % -------------------------------------------------------
 
 \begin{enumerate}
@@ -223,10 +210,10 @@ domains and that the SCM/DGP protocol is not chess-specific.
 \end{enumerate}
 
 % -------------------------------------------------------
-\section*{Structural Causal Model}
+\section{Structural Causal Model}
 % -------------------------------------------------------
 
-\subsection*{Variables and Structural Assumptions}
+\subsection{Variables and Structural Assumptions}
 
 We work at the level of individual decision points within games. For each decision,
 we define the following variables:
@@ -274,7 +261,7 @@ correspond directly to the competing back-door approximations formalized in the 
 $Z$ is learned under the same DGP and evaluated in the same pipeline as the other
 two representations.
 
-\subsection*{DAG and Causal Structure}
+\subsection{DAG and Causal Structure}
 
 The qualitative causal structure of the decision problem is summarized by the
 directed acyclic graph:
@@ -325,7 +312,7 @@ $X_{\text{adj}} \in \{ X_{\text{raw}},\, X_{\text{concept}},\, X_{\text{learned}
 as competing approximations to a valid back-door adjustment set and empirically
 compare how close each comes to satisfying the requisite ignorability condition.
 
-\subsection*{Role of Concept-Level Abstraction}
+\subsection{Role of Concept-Level Abstraction}
 
 Concept vectors \(C = f(S)\) are a fixed, deterministic encoding of the raw state
 \(S\), not a separate causal parent of \(T\) or \(Y\). Since all information in
@@ -380,7 +367,7 @@ how different encodings of state approximate a valid back-door adjustment set.}
 \end{figure}
 
 % -------------------------------------------------------
-\section*{Theoretical Motivation: Variance Reduction via Sufficient Encodings}
+\section{Theoretical Motivation: Variance Reduction via Sufficient Encodings}
 \label{sec:theory}
 % -------------------------------------------------------
 
@@ -432,7 +419,7 @@ results to causal sufficient dimension reduction, formalizing conditions under w
 low-dimensional reductions preserve causal effects in semiparametric estimation.
 
 % -------------------------------------------------------
-\section*{Experimental Setup}
+\section{Experimental Setup}
 % -------------------------------------------------------
 
 All experiments target the estimand $\tau = \mathbb{E}[Y(1) - Y(0) \mid F=1]$ as
@@ -440,7 +427,7 @@ defined in the SCM above. The three adjustment sets
 $X_{\text{adj}} \in \{X_{\text{raw}}, X_{\text{concept}}, X_{\text{learned}}\}$
 correspond directly to the competing back-door approximations formalized in the SCM.
 
-\subsection*{Data and Decision Extraction}
+\subsection{Data and Decision Extraction}
 We sample decision points from classical ($\geq$25 min) rated ($>$1800 Elo) games
 obtained via the Lichess public API. For each game, we uniformly sample up to 18
 positions from plies 10--120, extracting three covariate encodings per position: a
@@ -452,7 +439,7 @@ All three encodings are concatenated with a shared 6-dimensional context vector 
 (Elo differential, time control, move number, color, opening code, phase). The
 decision pool comprises ${\sim}30{,}000$ positions.
 
-\subsection*{Treatment and Outcome}
+\subsection{Treatment and Outcome}
 The binary treatment $T \in \{0,1\}$ is assigned via a rule-based aggression score
 $A(S,m)$ computed from captures, checks, king-zone pressure, sacrifices, and
 retreats---no engine evaluation enters $T$. We threshold at $A \geq 0.5$, yielding
@@ -469,13 +456,13 @@ $\tau^* = 0.3$ (homogeneous regime) or $\tau^*(X) = 0.1 + 0.3 \cdot
 introduced by soft-reassigning $T$ via a logit shift $\alpha \cdot U$ with $\alpha
 = 0.3$.
 
-\subsection*{Estimators}
+\subsection{Estimators}
 The primary estimator is the cross-fitted ($K{=}5$) Doubly Robust
 Learner\cite{chernozhukov2018double} with logistic regression propensity and
 LightGBM outcome models. We also fit a T-Learner baseline and a DR-Learner variant
 with a linear (Ridge) outcome model for robustness analysis.
 
-\subsection*{Experimental Grid}
+\subsection{Experimental Grid}
 The full grid sweeps $N \in \{1\text{k}, 2\text{k}, 5\text{k}, 10\text{k},
 20\text{k}\}$, $\gamma \in \{0, 0.3, 0.6\}$ confounding strengths, both $\tau^*$
 regimes, all three representations, all three estimator configurations, and 10
@@ -483,7 +470,7 @@ random seeds per cell (2{,}700 total fits). This grid is designed as a standardi
 protocol: any new representation can be slotted in by providing a featurization of
 the same positions and running the same pipeline.
 
-\subsection*{Learned Representation}
+\subsection{Learned Representation}
 The learned embedding $Z$ follows Kuang et al.\cite{kuang2020information} in a
 linear variant: standardize the concatenated raw features, fit a regularized
 logistic propensity model, project out the treatment-discriminative direction, and
@@ -491,7 +478,7 @@ PCA-compress the residual to 32 dimensions. This yields a deconfounding-flavoure
 embedding that trains in seconds per fold with no deep-learning
 dependency.\cite{deconfoundingScores}
 
-\subsection*{Secondary Environment: Structured Gridworld}
+\subsection{Secondary Environment: Structured Gridworld}
 To demonstrate that the testbed is not chess-specific, we instantiate the same
 SCM/DGP protocol on a structured $10 \times 10$ gridworld with obstacles and a
 goal. Variables map as follows: $S$ is a flattened one-hot grid encoding ($d = 300$);
@@ -537,7 +524,7 @@ $\gamma{=}0$, raw wins at $N\geq 1{,}000$ when $\gamma\geq 0.3$) is preserved
 across both readings.}
 
 % -------------------------------------------------------
-\section*{Results}
+\section{Results}
 % -------------------------------------------------------
 
 We present results for the canonical configuration: homogeneous $\tau^* = 0.3$,
@@ -545,7 +532,7 @@ $\gamma = 0.3$ (mild outcome-side latent confounding), $\alpha = 0.3$, DR-Learne
 with LightGBM outcome model. Full $\gamma$ and heterogeneous-$\tau^*$ results appear
 in the appendix.
 
-\subsection*{Regime Claims}
+\subsection{Regime Claims}
 We organize results around three empirical regime claims:
 
 \textbf{Claim 1 (Small-$N$ regime):} At $N < N^*(\gamma)$, expert concept encodings
@@ -568,7 +555,7 @@ confounding-relevant information the expert concept basis fails to capture.
 $X_{\text{concept}}$ exhibits more stable ATE estimates than $X_{\text{raw}}$, with
 $X_{\text{learned}}$ showing intermediate robustness depending on embedding quality.
 
-\subsection*{H1: Sample Efficiency (Fig.~\ref{fig:bias_vs_N})}
+\subsection{H1: Sample Efficiency (Fig.~\ref{fig:bias_vs_N})}
 Figure~\ref{fig:bias_vs_N} plots median ATE bias (with interquartile range) against
 sample size for the three representations across confounding levels. The plot
 exhibits a \emph{three-regime structure} that directly visualizes the two-part
@@ -625,7 +612,7 @@ achieves lower bias at all sample sizes, with the gap widest at small $N$
 \label{fig:bias_vs_N}
 \end{figure}
 
-\subsection*{H2: Nuisance-Model Robustness (Fig.~\ref{fig:robustness})}
+\subsection{H2: Nuisance-Model Robustness (Fig.~\ref{fig:robustness})}
 To test H2, we swap the DR-Learner's LightGBM outcome model for a linear Ridge
 model, holding the propensity model fixed. Figure~\ref{fig:robustness} shows the
 resulting ATE bias for each representation at $N = 2{,}000$, $\gamma = 0.3$. The
@@ -645,7 +632,7 @@ stable, confirming H2 and Claim 3.}
 \label{fig:robustness}
 \end{figure}
 
-\subsection*{Regime Diagram (Fig.~\ref{fig:heatmap})}
+\subsection{Regime Diagram (Fig.~\ref{fig:heatmap})}
 Figure~\ref{fig:heatmap} provides a bird's-eye view of estimation quality across
 the full $(\gamma, N)$ grid as a heatmap, where each cell is colored by the
 representation achieving lowest absolute ATE bias. This diagram directly summarizes
@@ -664,7 +651,7 @@ in $C$ begins to dominate the finite-sample nuisance penalty (Claim~2).}
 \label{fig:heatmap}
 \end{figure}
 
-\subsection*{Propensity Overlap (Fig.~\ref{fig:overlap})}
+\subsection{Propensity Overlap (Fig.~\ref{fig:overlap})}
 Figure~\ref{fig:overlap} displays propensity score histograms for each
 representation at $\gamma = 0.6$. The raw encoding produces extreme propensity
 scores near 0 and 1 (pre-clip minimum as low as $10^{-7}$), indicating severe
@@ -685,7 +672,7 @@ near-degenerate propensities (left); concept covariates maintain healthy overlap
 \label{fig:overlap}
 \end{figure}
 
-\subsection*{Mechanistic Diagnostics (Fig.~\ref{fig:nuisance})}
+\subsection{Mechanistic Diagnostics (Fig.~\ref{fig:nuisance})}
 To locate the source of each representation's performance profile, we directly
 measure the quality of the nuisance models the DR-Learner relies on:
 cross-validated propensity AUC and cross-validated outcome $R^2$, fitted on the
@@ -731,7 +718,7 @@ main ATE-bias results.}
 \label{fig:nuisance}
 \end{figure}
 
-\subsection*{Closing the Sufficiency Gap: Supervised Residual Compression}
+\subsection{Closing the Sufficiency Gap: Supervised Residual Compression}
 A natural test of the sufficiency-gap interpretation of Claim~2 is to augment
 the concept basis with a compressed residual of~$S$. We first tried a
 variance-preserving compression: linearly regress $S$ on $C$, PCA the residual
@@ -801,7 +788,7 @@ fully recovering raw's asymptotic advantage.}
 \label{fig:conplus}
 \end{figure}
 
-\subsection*{Concept-Level Causal Queries}
+\subsection{Concept-Level Causal Queries}
 A key advantage of concept-based adjustment is that it supports structured
 conditional ATE (CATE) queries not easily expressible in raw state space. We
 evaluate a suite of three concept-level queries under the canonical setting
@@ -846,7 +833,7 @@ representations enable modular, interpretable conditional reasoning that raw sta
 cannot support at a human-meaningful
 level.\cite{lemeire2005causalmodelsinchess,scholkopf2021towards}
 
-\subsection*{Oracle-Correlation Sanity Check}
+\subsection{Oracle-Correlation Sanity Check}
 A key threat to validity is that both the concept features $C$ and the
 semi-synthetic outcome $Y$ are partially derived from chess-engine computations,
 potentially inflating the concept advantage via shared computational pathways. We
@@ -864,7 +851,7 @@ is not an artifact of oracle correlation but reflects genuinely better covariate
 adjustment. Full ablation results appear in Appendix (Fig.~6).
 
 % -------------------------------------------------------
-\section*{Discussion}
+\section{Discussion}
 % -------------------------------------------------------
 
 Our results provide controlled empirical evidence for a clear representation-regime
@@ -903,7 +890,7 @@ absolute ATE estimates; our clipping strategy mitigates but does not eliminate t
 the regime structure in a real-world observational dataset.
 
 % -------------------------------------------------------
-\bibliographystyle{plain}
+\bibliographystyle{plainnat}
 \bibliography{refs}
 
 \end{document}

@@ -1,0 +1,10 @@
+gamma,tau_regime,pair,N_cross,bias_at_cross,N_cross_value,status
+0.0,homogeneous,learned_vs_concept,1807,0.02219708739241258,1806.8840659665495,within_grid
+0.0,homogeneous,raw_vs_concept,>20k,,,gt_max
+0.0,homogeneous,raw_vs_learned,>20k,,,gt_max
+0.3,homogeneous,learned_vs_concept,1107,0.07937201850505628,1106.5936023666197,within_grid
+0.3,homogeneous,raw_vs_concept,4713,0.0829934496140495,4712.650095010857,within_grid
+0.3,homogeneous,raw_vs_learned,6315,0.06769241470529017,6315.290369340793,within_grid
+0.6,homogeneous,learned_vs_concept,<1k,,,lt_min
+0.6,homogeneous,raw_vs_concept,4669,0.1557274573756081,4669.0043829549,within_grid
+0.6,homogeneous,raw_vs_learned,5216,0.14263516478570457,5215.650987634281,within_grid
