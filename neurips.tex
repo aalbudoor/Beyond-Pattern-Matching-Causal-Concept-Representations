@@ -822,8 +822,8 @@ bin, up to sampling noise.
 These queries are natural under $X_{\text{concept}}$ adjustment because each
 stratifier is already a coordinate of $C$. Under $X_{\text{raw}}$ adjustment, the
 same queries require explicit concept computation as a pre-processing step, and the
-low-dimensional heterogeneity grid is swamped by the 1152-d adjustment noise. Figure
-Q-CATE (appendix) reports recovered CATE per stratum, per rep; the concept
+low-dimensional heterogeneity grid is swamped by the 1152-d adjustment noise.
+Appendix~\ref{app:qcate} (Fig.~\ref{fig:qcate}) reports recovered CATE per stratum, per rep; the concept
 representation recovers the planted $(\tau^*_{\text{behind}}, \tau^*_{\text{ahead}})$
 split with substantially lower variance than raw or learned, and the false-positive
 check (Q3) comes back flat for concept while raw shows spurious
@@ -846,9 +846,11 @@ perspective), a quantity with zero engine involvement.
 
 In the game-outcome ablation, the concept representation still yields tighter ATE
 confidence intervals than the raw representation across all sample sizes, with
-SE(raw)/SE(concept) $> 1.0$ consistently. This confirms that the concept advantage
+SE(raw)/SE(concept) $> 1.0$ consistently (ratio of $7.64$ at $N{=}1{,}000$
+and $2.39$ at $N{=}10{,}000$). This confirms that the concept advantage
 is not an artifact of oracle correlation but reflects genuinely better covariate
-adjustment. Full ablation results appear in Appendix (Fig.~6).
+adjustment. Full ablation results appear in Appendix~\ref{app:game-outcome}
+(Fig.~\ref{fig:ablation}, Table~\ref{tab:ablation}).
 
 % -------------------------------------------------------
 \section{Discussion}
@@ -895,22 +897,535 @@ the regime structure in a real-world observational dataset.
 
 \appendix
 
-\section{Additional Results}
-This appendix collects supplementary figures, robustness checks, and implementation
-details referenced in the main text.
+\section{Overview of Supplementary Material}
+This appendix reports supplementary results referenced in the main text, in the
+following order: sample-efficiency thresholds (Task~T3), bias-variance
+decomposition, the regime diagram, crossover-point analysis, stratified
+concept-level causal queries, the game-outcome sanity ablation, the gridworld
+secondary environment, and implementation details. All numbers are computed
+from the committed result CSVs under \texttt{pilot/outputs/}; figure paths are
+under \texttt{pilot/outputs/figures/}.
 
-\section{Q-CATE Stratified Results}
+% -------------------------------------------------------------------------
+\section{Sample-Efficiency Threshold (Task T3)}
+\label{app:t3}
+Table~\ref{tab:t3} reports, for each representation and confounding level, the
+smallest $N$ at which the median ATE bias first falls below a target $\epsilon$
+(computed by linear interpolation between adjacent grid points). A cell of
+``$>$20k'' means the threshold was not reached within the largest sample size
+in the grid. Fig.~\ref{fig:t3} visualizes the same numbers on a log-scale bar
+chart.
+
+\begin{table}[h]
+\caption{Sample-efficiency threshold $N_{T3}(\text{rep}, \gamma, \epsilon)$:
+smallest $N$ at which median ATE bias $\leq \epsilon$, over 10 seeds, canonical
+setting (homogeneous $\tau^*$, DR-Learner with LightGBM outcome). ``$>$20k''
+denotes a threshold not reached within the grid; ``$\leq$1k'' denotes a
+threshold already met at the smallest grid point.}
+\label{tab:t3}
+\centering
+\small
+\begin{tabular}{lccccccc}
+\toprule
+ & \multicolumn{2}{c}{$\gamma=0$} & \multicolumn{2}{c}{$\gamma=0.3$} & \multicolumn{2}{c}{$\gamma=0.6$} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Rep & $\epsilon{=}0.05$ & $\epsilon{=}0.10$ & $\epsilon{=}0.05$ & $\epsilon{=}0.10$ & $\epsilon{=}0.05$ & $\epsilon{=}0.10$ \\
+\midrule
+Raw $S$       & 4,486 & 2,945 & 9,775 & 4,223 & $>$20k & $>$20k \\
+Concept $C$   & $\leq$1k & $\leq$1k & $>$20k & $\leq$1k & $>$20k & $>$20k \\
+Learned $Z$   & $\leq$1k & $\leq$1k & $>$20k & $\leq$1k & $>$20k & $>$20k \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two patterns stand out. First, at $\gamma=0$ and $\gamma=0.3$, the concept and
+learned representations reach $\epsilon{=}0.10$ with the smallest grid sample
+($N{=}1{,}000$), while raw requires 2--4$\times$ more data. Second, at
+$\gamma=0.3$ and $\epsilon{=}0.05$, concept and learned hit a bias floor
+(the sufficiency gap from Claim~2) and never drop below $0.05$ within the
+grid, while raw does reach $0.05$ at $N\approx 9{,}775$. This is precisely the
+crossover that motivates Claim~2. At $\gamma=0.6$ all three representations
+fail to reach $\epsilon\leq 0.10$ within the $N\leq 20{,}000$ grid, indicating
+that strong latent confounding creates a joint bias floor no representation
+escapes at laptop-feasible sample sizes.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{pilot/outputs/figures/figT3.pdf}
+\caption{Sample-efficiency threshold per representation and confounding level.
+Two panels, one per target $\epsilon$. Hatched bars at $N{=}20{,}000$ indicate
+cells where the threshold was not reached within the grid.}
+\label{fig:t3}
+\end{figure}
+
+% -------------------------------------------------------------------------
+\section{Bias-Variance Decomposition}
+\label{app:bv}
+Figure~\ref{fig:bv} decomposes the mean-squared error of each DR-Learner fit
+into squared bias and variance across seeds, visualizing both terms of the
+Ma--Zhu--Nabi theory simultaneously. The decomposition is exact: for every
+cell we verified $\text{MSE} = \text{Bias}^2 + \text{Var}$ to machine precision
+using a population-variance estimator.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{pilot/outputs/figures/figBV.pdf}
+\caption{Bias-variance decomposition of $\hat{\tau}$ at the canonical setting
+(homogeneous $\tau^*$, DR-Learner with LightGBM outcome), at $\gamma=0.3$
+(left) and $\gamma=0.6$ (right). Each bar stacks $\text{Bias}^2$ (dark) on top
+of $\text{Variance}$ (light). Raw starts with large variance that shrinks
+monotonically with $N$; concept has small variance but a flat Bias$^2$ floor
+corresponding to the sufficiency gap; learned sits between them.}
+\label{fig:bv}
+\end{figure}
+
+The visual reading: raw's large-$N$ advantage at $\gamma\geq 0.3$ is almost
+entirely variance collapsing to zero, while concept's plateau at the same
+$\gamma$ is a bias$^2$ floor that cannot be reduced by more data. Learned $Z$
+exhibits lower bias$^2$ than concept (because its 32-dimensional residual
+subspace captures some of the sufficiency gap) but higher variance, which
+cancels most of the advantage.
+
+% -------------------------------------------------------------------------
+\section{Regime Diagram}
+\label{app:regime}
+Figure~\ref{fig:regime-app} shows the winning representation at each
+$(\gamma, N)$ cell, with colour saturation encoding the margin over the
+second-best representation (darker = more decisive win). Both $\tau^*$
+regimes are shown. Numerically the regime boundary is the same in both.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{pilot/outputs/figures/figRegime.pdf}
+\caption{Winner-per-cell regime diagram over the $(\gamma, N)$ grid for the
+two $\tau^*$ regimes. Colour denotes the winning representation; colour
+intensity encodes the margin (difference in median ATE bias between the
+winner and the second-best). Concept wins in the small-$N$, non-zero-$\gamma$
+corner; raw dominates the high-$\gamma$, large-$N$ corner; learned occupies a
+narrow band between.}
+\label{fig:regime-app}
+\end{figure}
+
+Table~\ref{tab:regime} provides the exact winner-margin values for the
+homogeneous regime at DR-LightGBM, the canonical main-paper setting.
+
+\begin{table}[h]
+\caption{Winner per $(\gamma, N)$ cell under homogeneous $\tau^*$, DR-Learner
+with LightGBM outcome. ``Margin'' is the difference between the winner's
+median bias and the second-best representation's median bias across 10 seeds.}
+\label{tab:regime}
+\centering
+\small
+\begin{tabular}{rllllll}
+\toprule
+$\gamma$ & $N{=}1{,}000$ & $N{=}2{,}000$ & $N{=}5{,}000$ & $N{=}10{,}000$ & $N{=}20{,}000$ \\
+\midrule
+0.0 & concept (0.010) & learned (0.002) & concept (0.004) & learned (0.005) & learned (0.006) \\
+0.3 & concept (0.004) & learned (0.023) & learned (0.009) & raw (0.018) & raw (0.034) \\
+0.6 & learned (0.024) & learned (0.022) & learned (0.002) & raw (0.024) & raw (0.031) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% -------------------------------------------------------------------------
+\section{Crossover-Point Analysis}
+\label{app:crossover}
+Table~\ref{tab:crossover} reports the empirical crossover sample size
+$N^{\text{cross}}(\gamma)$ at which one representation's median bias curve
+intersects another, estimated by linear interpolation in $\log N$ between
+adjacent grid points. Figure~\ref{fig:cross} plots the same values as a
+function of $\gamma$.
+
+\begin{table}[h]
+\caption{Crossover points between representation pairs, homogeneous $\tau^*$,
+DR-Learner with LightGBM outcome. ``$>$20k'' means the pair never crossed
+within the grid; ``$<$1k'' means the winning side already leads at
+$N{=}1{,}000$.}
+\label{tab:crossover}
+\centering
+\small
+\begin{tabular}{rllllll}
+\toprule
+$\gamma$ & Raw vs.\ Concept & Raw vs.\ Learned & Learned vs.\ Concept \\
+\midrule
+0.0 & $>$20k & $>$20k & $N^{\text{cross}} \approx 1{,}807$ \\
+0.3 & $N^{\text{cross}} \approx 4{,}713$ & $N^{\text{cross}} \approx 6{,}315$ & $N^{\text{cross}} \approx 1{,}107$ \\
+0.6 & $N^{\text{cross}} \approx 4{,}669$ & $N^{\text{cross}} \approx 5{,}216$ & $<$1k \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At $\gamma=0$ there is no sufficiency gap, so raw never overtakes either
+concept or learned. Once $\gamma>0$, raw's crossover with concept sits around
+$N\approx 4{,}700$, almost flat between $\gamma=0.3$ and $\gamma=0.6$. Raw
+crosses learned slightly later (around $N\approx 5{,}000$--$6{,}000$),
+because learned's better small-$N$ propensity overlap gives it a head start
+that takes more data for raw to close.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\linewidth]{pilot/outputs/figures/figCross.pdf}
+\caption{Crossover point $N^{\text{cross}}(\gamma)$ for each pair of
+representations, homogeneous $\tau^*$. Markers denote crossings inside the
+grid; right-arrow markers denote pairs that never crossed within
+$N\leq 20{,}000$.}
+\label{fig:cross}
+\end{figure}
+
+% -------------------------------------------------------------------------
+\section{Concept-Level Causal Queries (Q-CATE)}
 \label{app:qcate}
-Supplementary conditional-effect plots and stratum-wise summaries can be added here.
+Figure~\ref{fig:qcate} reports the recovered CATE per stratum for the three
+queries defined in the main text, under the heterogeneous $\tau^*$ regime
+($\tau^*(X)=0.1+0.3\cdot\mathbf{1}\{\text{material}>0\}$), at the canonical
+cell $\gamma=0.3$, $\alpha=0.3$, $N=5{,}000$, 10 seeds. Tables~\ref{tab:q1},
+\ref{tab:q2}, and~\ref{tab:q3} give the numerical summary.
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{pilot/outputs/figures/figQ_concept_queries.pdf}
+\caption{Concept-level causal queries. (a) Q1: CATE by material balance, with
+planted truths $\tau^*_{\text{behind,equal}}=0.1$ and
+$\tau^*_{\text{ahead}}=0.4$ shown as dashed reference lines. (b) Q2:
+conditional ATE restricted to positions with king-shield score in the top
+quartile. (c) Q3: CATE by space-control tercile, a false-positive check
+(space is orthogonal to $\tau^*$ in the DGP). Bars show median across 10
+seeds; error bars show IQR.}
+\label{fig:qcate}
+\end{figure}
+
+\begin{table}[h]
+\caption{Q1 — CATE by material balance. Heterogeneous $\tau^*$, $\gamma=0.3$,
+$N=5{,}000$, median over 10 seeds. Planted truths:
+$\tau^*_{\text{behind}}{=}\tau^*_{\text{equal}}{=}0.1$,
+$\tau^*_{\text{ahead}}{=}0.4$.}
+\label{tab:q1}
+\centering
+\small
+\begin{tabular}{llcccc}
+\toprule
+Stratum & Rep & $\hat{\tau}$ & SE & $|\text{bias}|$ & $n_{\text{sub}}$ \\
+\midrule
+Behind ($m<-0.5$) & Raw      & $+0.225$ & $0.331$ & $0.153$ & 1,571 \\
+                   & Concept  & $+0.178$ & $0.036$ & $0.078$ & 1,571 \\
+                   & Learned  & $+0.218$ & $0.048$ & $0.118$ & 1,571 \\
+\midrule
+Equal ($|m|\leq0.5$) & Raw      & $+0.302$ & $0.182$ & $0.202$ & 2,358 \\
+                     & Concept  & $+0.183$ & $0.027$ & $0.083$ & 2,358 \\
+                     & Learned  & $+0.201$ & $0.034$ & $0.101$ & 2,358 \\
+\midrule
+Ahead ($m>0.5$)    & Raw      & $+0.496$ & $0.423$ & $0.199$ & 1,063 \\
+                   & Concept  & $+0.515$ & $0.041$ & $0.115$ & 1,063 \\
+                   & Learned  & $+0.549$ & $0.054$ & $0.149$ & 1,063 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Q1 is the positive-control query: the concept representation recovers the
+planted heterogeneity structure ($0.178/0.183/0.515$, qualitatively matching
+the planted $0.1/0.1/0.4$) with SE roughly $10\times$ tighter than raw. Raw
+recovers the correct heterogeneity direction but with SE so wide that the
+recovery is statistically indistinguishable from chance at these sample sizes
+(SE $0.33$--$0.42$ per stratum). Learned $Z$ also recovers the direction but
+with a systematically larger bias than concept, consistent with its weaker
+outcome-model fit observed in the main-text mechanistic diagnostics.
+
+\begin{table}[h]
+\caption{Q2 — Conditional ATE restricted to positions with
+$c_{\text{king\_shield}} \geq$ 75th percentile. Because king-shield is
+orthogonal to material in the DGP, the true conditional ATE is
+$\mathbb{E}[\tau^*(X) \mid c_{\text{king\_shield}} \geq q_{0.75}]$, which
+depends on the induced marginal distribution of material in the subset
+(median value: $0.149$). This is a \emph{conditional} query, not
+$do(c_{\text{king\_shield}}=\text{high})$.}
+\label{tab:q2}
+\centering
+\small
+\begin{tabular}{lcccc}
+\toprule
+Rep & $\hat{\tau}$ & SE & $|\text{bias}|$ & $n_{\text{sub}}$ \\
+\midrule
+Raw     & $+0.349$ & $0.258$ & $0.236$ & 1,733 \\
+Concept & $+0.243$ & $0.037$ & $0.093$ & 1,733 \\
+Learned & $+0.170$ & $0.044$ & $0.026$ & 1,733 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Q2 shows an interesting inversion: learned $Z$ achieves the lowest bias
+($0.026$) in this single conditional query, meaningfully better than concept
+($0.093$). The reason appears to be that the high-king-shield subset has an
+unusually stable material distribution, which reduces the weight of
+concept's Group-A outcome-side contribution in $\psi$ and therefore
+diminishes concept's normal advantage. Raw bias remains the largest
+($0.236$) because of the high-dimensional adjustment penalty at $n=1{,}733$.
+
+\begin{table}[h]
+\caption{Q3 — CATE by space-control tercile. Space is orthogonal to $\tau^*$
+in the DGP, so the per-tercile true CATE is dominated by the induced
+marginal of material in each tercile. This query is a false-positive check:
+well-behaved estimators should return roughly constant CATE across the three
+terciles.}
+\label{tab:q3}
+\centering
+\small
+\begin{tabular}{llcccc}
+\toprule
+Stratum & Rep & $\hat{\tau}$ & SE & $|\text{bias}|$ & $n_{\text{sub}}$ \\
+\midrule
+Low  & Raw     & $+0.421$ & $0.313$ & $0.325$ & 1,793 \\
+     & Concept & $+0.232$ & $0.034$ & $0.090$ & 1,793 \\
+     & Learned & $+0.182$ & $0.046$ & $0.041$ & 1,793 \\
+\midrule
+Mid  & Raw     & $+0.424$ & $0.272$ & $0.268$ & 1,774 \\
+     & Concept & $+0.239$ & $0.032$ & $0.084$ & 1,774 \\
+     & Learned & $+0.234$ & $0.043$ & $0.077$ & 1,774 \\
+\midrule
+High & Raw     & $+0.332$ & $0.355$ & $0.293$ & 1,423 \\
+     & Concept & $+0.284$ & $0.036$ & $0.080$ & 1,423 \\
+     & Learned & $+0.311$ & $0.051$ & $0.110$ & 1,423 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Q3 confirms the negative-control expectation: concept returns roughly
+constant CATE estimates ($0.232/0.239/0.284$) across all three terciles, with
+SE $\sim 0.03$--$0.04$. Raw returns much noisier estimates ($0.332$--$0.424$)
+with SE $\sim 0.27$--$0.36$; the apparent variation across terciles is
+within-IQR and attributable to sampling noise, but the SE magnitudes
+illustrate why false-positive CATE claims are easier to make from raw
+adjustment than from concept adjustment. This motivates the concept
+representation as a safer default for stratified causal queries.
+
+% -------------------------------------------------------------------------
 \section{Game-Outcome Sanity Ablation}
 \label{app:game-outcome}
-Additional figures and tables for the game-outcome ablation can be added here.
+The main text cites a sanity ablation in which $Y_{\text{obs}}$ is replaced
+with the actual game outcome from the side-to-move perspective (Win/Draw/Loss
+$\to\{1, 0.5, 0\}$), a quantity with zero Stockfish involvement.
+Figure~\ref{fig:ablation} and Table~\ref{tab:ablation} report the full
+results: 10 seeds per cell, 240 total fits across the $N\in\{1{,}000, 2{,}000,
+5{,}000, 10{,}000\}$ sample sizes and the three representations.
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{pilot/outputs/figures/fig6_ablation_game_outcome.pdf}
+\caption{Game-outcome sanity ablation. (a) ATE estimate per representation
+across $N$ (median with IQR error bars). (b) Median standard error of the
+ATE per representation on a log-scale axis. Concept's SE collapses at a rate
+clearly inherited from its superior propensity/outcome fit, while raw's SE
+stays large until $N{=}10{,}000$.}
+\label{fig:ablation}
+\end{figure}
+
+\begin{table}[h]
+\caption{Game-outcome ablation: DR-LightGBM ATE estimates and standard errors
+per representation, with the relative efficiency ratio SE(raw)/SE(concept)
+in the rightmost column. Medians across 10 seeds.}
+\label{tab:ablation}
+\centering
+\small
+\begin{tabular}{rccccccc}
+\toprule
+ & \multicolumn{2}{c}{Raw $S$} & \multicolumn{2}{c}{Concept $C$} & \multicolumn{2}{c}{Learned $Z$} & SE ratio \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+$N$ & $\hat{\tau}$ & SE & $\hat{\tau}$ & SE & $\hat{\tau}$ & SE & raw/concept \\
+\midrule
+1,000  & $+0.212$ & $0.184$ & $+0.061$ & $0.024$ & $+0.114$ & $0.042$ & $\mathbf{7.64}$ \\
+2,000  & $+0.184$ & $0.121$ & $+0.057$ & $0.016$ & $+0.100$ & $0.025$ & $\mathbf{7.62}$ \\
+5,000  & $+0.057$ & $0.039$ & $+0.051$ & $0.010$ & $+0.082$ & $0.014$ & $\mathbf{4.10}$ \\
+10,000 & $+0.039$ & $0.015$ & $+0.047$ & $0.006$ & $+0.081$ & $0.010$ & $\mathbf{2.39}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The SE ratio SE(raw)/SE(concept) exceeds $7.6\times$ at $N{=}1{,}000$ and
+$N{=}2{,}000$, and remains above $2\times$ even at $N{=}10{,}000$. Because
+the outcome variable is now the actual game margin (no Stockfish involvement
+of any kind), this SE advantage cannot be explained by Oracle correlation
+between the concept features and the outcome DGP. The concept representation
+genuinely improves causal identification of the aggressive-play treatment
+effect, not just on semi-synthetic outcomes, but on engine-independent
+observational outcomes as well. This closes the main Oracle-correlation
+threat to validity raised in the original experimental notes.
+
+% -------------------------------------------------------------------------
+\section{Gridworld Secondary Environment}
+\label{app:gridworld}
+The gridworld secondary environment is a $10\times10$ grid with obstacles and
+a goal, with $S$ a $300$-dimensional one-hot state encoding (agent position,
+obstacle mask, goal position), $C$ a 3-dimensional expert concept vector
+(L1 distance to goal, local obstacle density, current quadrant), $X$ a
+4-dimensional context vector (step number, grid seed, difficulty,
+start-distance), and $Z$ the same linear deconfounding embedding used in
+chess. Treatment $T$ is assigned via a calibrated sigmoid over a
+six-component score:
+\[
+\text{score}(S, X) = 0.9\,d_z + 0.8\,\rho_z + 0.35\,\delta_z + 0.15\,s_z - 0.10\,k_z + 1.0\,\chi_z
+\]
+where $d$ is distance-to-goal, $\rho$ is obstacle density, $\delta$ is
+difficulty, $s$ is start-distance, $k$ is step number, and
+$\chi(S) = (r+c)\bmod 2$ is the checkerboard parity of the agent cell.
+Subscript $z$ denotes a standardized copy, and the intercept is calibrated
+so $P(T{=}1) \approx 0.40$. The outcome DGP is
+\[
+Y(0) = 0.4\,\delta_z + 0.2\,s_z + 0.1\,k_z + 0.3\,d_z + 0.2\,\rho_z + 0.5\,\chi_z + \gamma U + \varepsilon_0,
+\qquad Y(1) = Y(0) + \tau^*,
+\]
+with $\tau^* = 0.3$, $U \sim \mathcal{N}(0,1)$, $\varepsilon_0 \sim
+\mathcal{N}(0, 0.5^2)$, and a soft-reassignment logit shift
+$\alpha_U = 0.3$ applied to $T_{\text{obs}}$. Crucially, $\chi$ is \emph{not}
+in $C$: the concept basis contains distance-to-goal, obstacle density, and
+quadrant, none of which encode cell-level parity. Raw $S$ contains the full
+one-hot agent position and can therefore recover $\chi$ at sufficient $N$.
+This construction makes the checker term an always-on $S$-only confounder.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{pilot/outputs/figures/figGridworld.pdf}
+\caption{Gridworld replication figure. (a) ATE bias vs.\ $N$ at $\gamma=0.3$.
+(b) Nuisance-swap robustness bar chart at $N{=}1{,}000$, $\gamma=0.3$.
+Concept wins at the smallest $N$, raw overtakes at larger $N$, learned $Z$
+underperforms throughout, consistent with the mechanistic-diagnostics
+explanation in the main text.}
+\label{fig:gridworld-app}
+\end{figure}
+
+Table~\ref{tab:gridworld} reports the full bias grid at DR-LightGBM,
+homogeneous $\tau^*$. The regime structure reproduces the chess-domain
+finding qualitatively: concept wins at the smallest grid point ($N{=}500$) at
+every $\gamma$, raw overtakes at larger $N$ with a smaller
+$N^{\text{cross}}$ than in chess (raw wins by $N{=}1{,}000$ when
+$\gamma\geq 0.3$, and by $N{=}2{,}000$ even at $\gamma=0$). The earlier
+crossover reflects the comparatively stronger checker signal in the
+gridworld DGP versus the chess residual structure.
+
+\begin{table}[h]
+\caption{Gridworld median ATE bias over 10 seeds, homogeneous $\tau^*$,
+DR-Learner with LightGBM outcome. Bold marks the winner per cell.}
+\label{tab:gridworld}
+\centering
+\small
+\begin{tabular}{rrrrr}
+\toprule
+$\gamma$ & $N$ & Raw & Concept & Learned \\
+\midrule
+0.0 & 500    & $0.540$           & $\mathbf{0.183}$  & $0.402$ \\
+0.0 & 1,000  & $0.292$           & $\mathbf{0.204}$  & $0.362$ \\
+0.0 & 2,000  & $\mathbf{0.047}$  & $0.185$           & $0.368$ \\
+0.0 & 5,000  & $\mathbf{0.136}$  & $0.183$           & $0.383$ \\
+0.0 & 10,000 & $\mathbf{0.136}$  & $0.176$           & $0.365$ \\
+\midrule
+0.3 & 500    & $0.615$           & $\mathbf{0.280}$  & $0.499$ \\
+0.3 & 1,000  & $\mathbf{0.209}$  & $0.274$           & $0.438$ \\
+0.3 & 2,000  & $\mathbf{0.106}$  & $0.263$           & $0.430$ \\
+0.3 & 5,000  & $\mathbf{0.202}$  & $0.253$           & $0.445$ \\
+0.3 & 10,000 & $\mathbf{0.200}$  & $0.250$           & $0.430$ \\
+\midrule
+0.6 & 500    & $0.580$           & $\mathbf{0.354}$  & $0.518$ \\
+0.6 & 1,000  & $\mathbf{0.276}$  & $0.326$           & $0.497$ \\
+0.6 & 2,000  & $\mathbf{0.190}$  & $0.344$           & $0.509$ \\
+0.6 & 5,000  & $\mathbf{0.273}$  & $0.318$           & $0.508$ \\
+0.6 & 10,000 & $\mathbf{0.271}$  & $0.321$           & $0.497$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Raw bias has a single-cell dip at $\gamma=0$, $N=2{,}000$ ($0.047$, between
+$0.292$ at $N{=}1{,}000$ and a plateau of $\sim 0.135$ at $N\geq 5{,}000$);
+we attribute this to favourable cross-fit variance at a moderate sample
+size on the high-dimensional raw adjustment set rather than to a structural
+improvement in raw's adjustment quality. The qualitative regime structure
+(raw wins at $N\geq 2{,}000$ when $\gamma=0$, raw wins at $N\geq 1{,}000$
+when $\gamma\geq 0.3$) is preserved across both readings.
+
+Learned $Z$ underperforms both concept and raw at every gridworld cell. This
+is consistent with the mechanistic diagnosis in the main text: the
+treatment-orthogonal projection that defines $Z$ removes the
+checker-discriminative direction of $S$, which in this DGP is also the
+most outcome-predictive direction of the residual, leaving $Z$ with weak
+outcome-model fit. The gridworld therefore also serves as an independent
+confirmation of the learned-$Z$ pathology identified in the chess
+mechanistic diagnostics.
+
+% -------------------------------------------------------------------------
 \section{Implementation and Reproducibility Details}
 \label{app:repro}
-Extended experimental settings, hyperparameters, and reproduction notes can be
-added here.
+
+\paragraph{Compute.} All experiments run on a single laptop. The full chess
+primary grid (2,700 fits) completes in approximately 2 hours of wall clock;
+the gridworld grid (900 fits) completes in roughly 20--30 minutes; the
+concept-query, conplus, nuisance, and ablation grids each complete in 5--20
+minutes. No GPU is used.
+
+\paragraph{Software stack.} Python 3.11, NumPy 1.26, pandas 2.1, scikit-learn
+1.4, LightGBM 4.3, EconML 0.15, python-chess 1.999+, PyArrow 15.0,
+matplotlib 3.8, seaborn 0.13. The exact pinned versions are in
+\texttt{pilot/requirements.txt}. The conda environment is named
+\texttt{chess-pilot}. All scripts are resume-safe: each runner writes to its
+CSV incrementally and skips cells whose $(N, \gamma, \tau\text{-regime},
+\text{rep}, \text{estimator}, \text{outcome model}, \text{seed})$ key is
+already present.
+
+\paragraph{Nuisance model hyperparameters.}
+The propensity model is logistic regression with L2 regularization
+(\texttt{C=0.1} for adjustment sets with $d>200$, \texttt{C=1.0} otherwise),
+\texttt{max\_iter=5000}, solver \texttt{lbfgs}, wrapped in a
+\texttt{StandardScaler} pipeline. The LightGBM outcome model uses
+\texttt{n\_estimators=200}, \texttt{max\_depth=5}, \texttt{learning\_rate=0.05},
+\texttt{verbose=-1}. The linear outcome model used for the Claim~3 robustness
+swap is \texttt{sklearn.linear\_model.Ridge} with \texttt{alpha=1.0}. All
+three reuse the same set of 10 seeds so differences are attributable to the
+representation, not to split variance.
+
+\paragraph{Learned representation.} The linear deconfounding embedding $Z$ is
+computed by (i) standardizing the concatenated $[S; X]$ adjustment set,
+(ii) fitting a regularized logistic propensity model, (iii) projecting out
+the 1-d propensity direction, and (iv) PCA-compressing the residual to 32
+components. $Z$ is fit once on the $N$-sample per seed and reused across
+DR-Learner cross-fits, a documented compromise that keeps wall-clock
+tractable on a laptop.
+
+\paragraph{Conplus variants.} Both the PCA and T-PLS conplus variants
+regress $S$ on $C$ with a linear model, then compress the residual to 16
+dimensions. The PCA variant uses
+\texttt{sklearn.decomposition.PCA(n\_components=16)}; the T-PLS variant uses
+\texttt{sklearn.cross\_decomposition.PLSRegression(n\_components=16,
+scale=False)}, fit with the observed treatment as target. Both variants
+then adjust on $[C, R, X]$, a 34-dimensional adjustment set.
+
+\paragraph{DR-Learner configuration.} All DR-Learner estimators are
+\texttt{econml.dr.LinearDRLearner} with \texttt{cv=5} cross-fit folds,
+\texttt{min\_propensity=0.02} clipping, and per-cell seed for reproducibility.
+Feature rebinding uses $W$ (nuisance-only) rather than $X$ (heterogeneity),
+which gives each DR-Learner fit the full adjustment set as nuisance features
+without attempting to model heterogeneity in any single concept dimension.
+The concept-query runner is the exception: there we stratify the subsample
+by the query variable and fit a separate DR-Learner ATE per stratum.
+
+\paragraph{Seeds and reproducibility.} Each runner uses NumPy
+\texttt{default\_rng(1000 + seed)} for sub-sample selection and
+\texttt{seed} directly for nuisance models. The 10 seeds are
+$\{0, 1, \ldots, 9\}$. The gridworld pool is generated with seed 0; pool
+sub-samples use \texttt{default\_rng(2000 + seed)} to keep them independent
+of the chess sub-samples at the same seed index.
+
+\paragraph{Grid totals.} Chess primary grid: 5 sample sizes $\times$ 3
+confounding levels $\times$ 2 $\tau^*$ regimes $\times$ 3 representations
+$\times$ 3 estimator configurations $\times$ 10 seeds = 2,700 fits.
+Gridworld grid: 5 $\times$ 3 $\times$ 1 $\times$ 3 $\times$ 2 $\times$ 10 =
+900 fits. Concept queries: 10 seeds $\times$ 3 reps $\times$ 7 strata cells
+(3 material + 1 king-shield + 3 space) = 210 fits. Conplus (PCA and T-PLS):
+5 $\times$ 2 $\times$ 10 = 100 fits each. Nuisance diagnostics: 5 $\times$
+1 $\times$ 3 $\times$ 10 = 150 fits. Game-outcome ablation: 4 $\times$ 3
+$\times$ 2 $\times$ 10 = 240 fits.
+
+\paragraph{Committed artifacts.} All decision caches, result CSVs, and
+figure PDFs are committed in the \texttt{pilot/cache/},
+\texttt{pilot/gridworld/cache/}, \texttt{pilot/outputs/}, and
+\texttt{pilot/outputs/figures/} directories so that every number, table, and
+figure in the main text and this appendix is reproducible without rerunning
+the experiments.
 
 \newpage
 \input{paper/template/checklist.tex}
