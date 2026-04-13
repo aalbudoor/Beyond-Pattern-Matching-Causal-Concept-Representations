@@ -5,7 +5,7 @@ Constructs a low-dimensional representation:
 
     X_conplus = [C, T-PLS_16(S - E[S|C]), context]
 
-and runs the canonical restricted grid from experimental_plan_v2.md:
+and runs the canonical restricted grid from docs/experimental_plan_v2.md:
     - N in {1000, 2000, 5000, 10000, 20000}
     - gamma in {0.3, 0.6}
     - tau_regime in {homogeneous}

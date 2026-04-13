@@ -49,15 +49,15 @@ The committed results support the following broad picture:
 - **T-supervised residual compression helps** in the mid-range but does not fully recover raw's asymptotic advantage.
 - **The gridworld checkerboard fix creates a real raw-vs-concept crossover**, though the final tuned version is stronger than the original target regime.
 
-For the detailed handoff on the two follow-up findings, see [finding_1_2_summary_report.md](finding_1_2_summary_report.md).
+For the detailed handoff on the two follow-up findings, see [docs/finding_1_2_summary_report.md](docs/finding_1_2_summary_report.md).
 
 ## Manuscript Files
 
 - [neurips.tex](neurips.tex): primary manuscript source going forward
 - [neurips.pdf](neurips.pdf): compiled NeurIPS-format PDF
-- [main.tex](main.tex): working/full manuscript source retained for project history
+- [archive/main.tex](archive/main.tex): legacy manuscript source retained for history
 - [neurips_2026.sty](neurips_2026.sty): official NeurIPS style file committed locally
-- [checklist.tex](checklist.tex): NeurIPS checklist template
+- [paper/template/](paper/template/): archived NeurIPS template bundle
 
 ## Build the Paper
 
@@ -98,11 +98,16 @@ Important note:
 .
 ├── neurips.tex                    NeurIPS manuscript source
 ├── neurips.pdf                    Compiled NeurIPS manuscript
-├── main.tex                       Working/full manuscript source
+├── neurips_2026.sty               NeurIPS style file used by neurips.tex
+├── archive/
+│   └── main.tex                   Legacy manuscript source
+├── docs/
+│   ├── experimental_notes.md      Original locked setup
+│   ├── experimental_plan_v2.md    v2 extension plan
+│   └── finding_1_2_summary_report.md  Handoff note for Findings 1 and 2
+├── paper/
+│   └── template/                  Archived NeurIPS template bundle
 ├── refs.bib                       Bibliography
-├── experimental_notes.md          Original locked setup
-├── experimental_plan_v2.md        v2 extension plan
-├── finding_1_2_summary_report.md  Handoff note for Findings 1 and 2
 ├── pilot/
 │   ├── pilot.py                   Minimum pilot runner
 │   ├── primary.py                 Full chess grid runner

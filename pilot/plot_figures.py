@@ -2,7 +2,7 @@
 Figure generation for the Beyond Pattern Matching chess causality study.
 
 Reads primary_results.csv and produces Figs 2–5 as described in
-experimental_notes.md §5:
+docs/experimental_notes.md §5:
 
     Fig 2: ATE bias vs N  (H1 money figure — sample efficiency)
     Fig 3: Heatmap of ATE-RMSE over (γ, N) at fixed estimator, per rep

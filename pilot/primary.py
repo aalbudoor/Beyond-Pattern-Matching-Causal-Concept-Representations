@@ -1,7 +1,7 @@
 """
 Primary grid runner for the Beyond Pattern Matching chess causality study.
 
-Runs the full locked grid from experimental_notes.md:
+Runs the full locked grid from docs/experimental_notes.md:
     - N           in {1000, 2000, 5000, 10000, 20000}
     - gamma       in {0.0, 0.3, 0.6}                       (outcome-side latent confounding)
     - alpha_U     = 0.3                                    (treatment-side latent confounding, fixed)

@@ -1,7 +1,7 @@
 """
 Pilot runner for the Beyond Pattern Matching chess causality study.
 
-Scope (per experimental_notes.md §'Minimum pilot'):
+Scope (per docs/experimental_notes.md §'Minimum pilot'):
     - Representations: raw S and expert C (skip learned Z for pilot).
     - Estimator: Linear DR-Learner only.
     - Grid: N in {2000, 5000} x gamma in {0.0, 0.3} x homogeneous tau* x 3 seeds.
@@ -587,7 +587,7 @@ def _standardize(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
 
 def generate_outcomes(df: pd.DataFrame, gamma: float, tau_star: float,
                       alpha_U: float, seed: int) -> pd.DataFrame:
-    """Construct Y per §3.3 of experimental_notes.md.
+    """Construct Y per §3.3 of docs/experimental_notes.md.
 
     Y only depends on standardized context phi(X) and Group A concepts psi(C)
     plus latent U and Gaussian noise. Stockfish eval does not appear.

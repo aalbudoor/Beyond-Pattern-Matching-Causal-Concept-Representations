@@ -49,7 +49,7 @@ Key implementation details:
   - PCA residual (`conplus_pca`, loaded from [pilot/outputs/conplus_results.csv](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/outputs/conplus_results.csv))
   - T-PLS residual (`conplus_tpls`, loaded from [pilot/outputs/conplus_supervised_results.csv](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/outputs/conplus_supervised_results.csv))
 
-Paper text for this finding was added in [main.tex](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/main.tex:650).
+Paper text for this finding was added in [neurips.tex](../neurips.tex).
 
 ### What Was Run
 
@@ -172,7 +172,7 @@ Specific changes:
 - [pilot/gridworld/treatment.py](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/gridworld/treatment.py:32) now includes a checker term in the treatment score
 - [pilot/gridworld/dgp.py](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/gridworld/dgp.py:42) now includes a checker term in `psi`
 
-Paper text was updated in [main.tex](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/main.tex:494).
+Paper text was updated in [neurips.tex](../neurips.tex).
 
 ### Important Deviation From the Initial Requested Coefficients
 
@@ -190,7 +190,7 @@ The **final locked-in setting** that was actually rerun and left in code is:
 
 This means the paper text was also updated to reflect the stronger final DGP:
 
-- [main.tex](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/main.tex:503) now says the outcome DGP adds a `$0.5\\,\\chi$` term
+- [neurips.tex](../neurips.tex) now says the outcome DGP adds a `$0.5\\,\\chi$` term
 
 ### What Was Run
 
@@ -290,4 +290,3 @@ These two follow-ups sharpened the paper’s story, but both came back as **qual
 If the assistant needs a one-sentence takeaway:
 
 > Finding 1 shows that PCA residual augmentation fails while T-supervised residual augmentation helps but does not fully recover raw’s asymptotic edge; Finding 2 injects a real hidden confounder into gridworld and creates a crossover, but only after strengthening the parity signal beyond the originally requested coefficients, yielding a crossover that is qualitatively right but too aggressive.
-

@@ -1,7 +1,7 @@
 """
 Sanity ablation: game-outcome Y (Oracle-correlation defense).
 
-Per experimental_notes.md §4, this re-runs the primary grid with
+Per docs/experimental_notes.md §4, this re-runs the primary grid with
 Y_obs = game outcome from the side-to-move perspective:
     Win  → 1.0
     Draw → 0.5

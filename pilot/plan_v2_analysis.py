@@ -1,5 +1,5 @@
 """
-Phase 1 analysis deliverables for experimental_plan_v2.md.
+Phase 1 analysis deliverables for docs/experimental_plan_v2.md.
 
 All analyses operate on the completed primary grid in outputs/primary_results.csv
 and emit the new CSV/figure artifacts promised in the v2 plan:

@@ -1,7 +1,7 @@
 # Pilot Runner
 
 Minimum pilot for the Beyond Pattern Matching chess causality study.
-Spec: `../experimental_notes.md`, section "Minimum pilot".
+Spec: `../docs/experimental_notes.md`, section "Minimum pilot".
 
 ## What it runs
 

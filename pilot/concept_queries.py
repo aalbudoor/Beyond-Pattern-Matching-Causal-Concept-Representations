@@ -1,5 +1,5 @@
 """
-Concept-level causal queries (§"Concept-Level Causal Queries" in main.tex).
+Concept-level causal queries (§"Concept-Level Causal Queries" in neurips.tex).
 
 Three stratified CATE queries under the canonical setting
 (heterogeneous tau*, gamma=0.3, alpha=0.3, N=5000, 10 seeds):

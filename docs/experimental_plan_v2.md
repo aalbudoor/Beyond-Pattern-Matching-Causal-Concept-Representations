@@ -17,7 +17,7 @@ The experiments in this plan are intended to:
 1. Put concrete numbers behind the crossover claim
 2. Visually demonstrate both terms of the theory on the same figure
 3. Cover the testbed tasks (T1, T2, T3) promised in the abstract
-4. Fill the Concept-Level Causal Queries and Gridworld sections already drafted in `main.tex`
+4. Fill the Concept-Level Causal Queries and Gridworld sections already drafted in `neurips.tex`
 
 ---
 
@@ -422,7 +422,7 @@ Do Plans 1, 2, 3, 5 first. These require no new fits, take < 2 hours of coding t
 Run Plan 4 (already coded). Then decide whether Plan 7 is worth the effort — it's the single biggest paper elevation if it works.
 
 **Phase 3 (expensive):**
-Plans 6 and 8 are optional depending on how much reviewer-convincing the paper needs for the testbed framing. Plan 6 is load-bearing if the `main.tex` gridworld section stays in; Plan 8 is a nice-to-have.
+Plans 6 and 8 are optional depending on how much reviewer-convincing the paper needs for the testbed framing. Plan 6 is load-bearing if the `neurips.tex` gridworld section stays in; Plan 8 is a nice-to-have.
 
 **Deliverable from Phase 1:**
 - `pilot/outputs/t3_threshold.csv` + `figures/figT3.pdf`
