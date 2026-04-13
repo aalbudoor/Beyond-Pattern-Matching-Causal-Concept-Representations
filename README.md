@@ -1,4 +1,4 @@
-# Beyond Pattern Matching: Causal Concept Representations for Strategic Decision-Making in Chess
+# Beyond Pattern Matching: Causal Concept Representations
 
 Course project for **ML808 — Causality & Machine Learning** at **MBZUAI**.
 
@@ -6,18 +6,23 @@ Course project for **ML808 — Causality & Machine Learning** at **MBZUAI**.
 
 ## Project Summary
 
-This repository contains a semi-synthetic causal testbed for strategic decision-making in chess. The core question is whether expert-defined, human-interpretable chess concepts form a more sample-efficient adjustment basis for ATE estimation than:
+This repository contains a two-environment semi-synthetic causal testbed for strategic decision-making. The core question is whether expert-defined, human-interpretable concepts form a more sample-efficient adjustment basis for ATE estimation than:
 
-- raw board states
+- raw high-dimensional state encodings
 - a learned low-dimensional deconfounding embedding
 
-The project compares three covariate encodings of the same back-door adjustment problem:
+Two environments instantiate the same SCM/DGP protocol:
 
-1. `X_raw = (S, X)` — raw bitboard-style board encoding plus context
+1. **Chess** (primary) — 1152-dimensional bitboard states, 12 expert chess concepts, rule-based aggressive-vs-conservative treatment, semi-synthetic outcome grounded in structural board features.
+2. **Structured Gridworld** (secondary) — 10×10 grid with obstacles and a goal, 300-dimensional one-hot state, 3 expert concepts (distance-to-goal, obstacle density, quadrant), sigmoid-based treatment including a hidden checkerboard confounder that raw `S` can recover but `C` cannot.
+
+In each environment the project compares three covariate encodings of the same back-door adjustment problem:
+
+1. `X_raw = (S, X)` — raw state encoding plus context
 2. `X_concept = (C, X)` — expert concept vector plus context
 3. `X_learned = (Z, X)` — learned linear deconfounding embedding plus context
 
-The estimand is the ATE of an aggressive-vs-conservative strategic treatment under a semi-synthetic DGP with planted ground-truth effects.
+The estimand is the ATE of a binary strategic treatment under a semi-synthetic DGP with planted ground-truth effects.
 
 ## Current Status
 
