@@ -27,11 +27,8 @@ from __future__ import annotations
 
 import argparse
 import csv
-import os
 import time
-from dataclasses import dataclass, asdict, fields
-from pathlib import Path
-from typing import Iterable
+from dataclasses import dataclass, fields
 
 import numpy as np
 import pandas as pd
@@ -39,8 +36,8 @@ from tqdm import tqdm
 
 # Reuse all feature / DGP infrastructure from the pilot module
 from pilot import (
-    CACHE, OUT, DECISIONS_PATH,
-    GROUP_A_FEATURES, GROUP_B_FEATURES,
+    OUT, DECISIONS_PATH,
+    GROUP_A_FEATURES,
     CONCEPT_FEATURES, CONTEXT_FEATURES, S_FEATURES,
     AGGRESSION_THRESHOLD,
     MIN_PROPENSITY,

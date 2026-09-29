@@ -180,9 +180,9 @@ def fig4(df: pd.DataFrame, tau_regime: str = CANONICAL_TAU, gamma: float = CANON
             vals.append(med)
             errs_lo.append(med - q25)
             errs_hi.append(q75 - med)
-        bars = ax.bar(x + i * width - width / 2, vals, width,
-                      label=outcome_labels.get(om, om),
-                      yerr=[errs_lo, errs_hi], capsize=3, alpha=0.85)
+        ax.bar(x + i * width - width / 2, vals, width,
+               label=outcome_labels.get(om, om),
+               yerr=[errs_lo, errs_hi], capsize=3, alpha=0.85)
 
     ax.set_xticks(x)
     ax.set_xticklabels([REP_LABELS[r] for r in reps], fontsize=9)
@@ -211,7 +211,7 @@ def fig5(df_pool: pd.DataFrame | None = None,
         from pilot import (
             DECISIONS_PATH, AGGRESSION_THRESHOLD,
             CONCEPT_FEATURES, CONTEXT_FEATURES, S_FEATURES,
-            _make_propensity_model, _standardize,
+            _make_propensity_model,
         )
         from primary import generate_outcomes_regime, fit_learned_Z, ALPHA_U
     except ImportError as e:

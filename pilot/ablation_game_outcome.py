@@ -29,7 +29,6 @@ from __future__ import annotations
 import csv
 import time
 from dataclasses import dataclass, fields
-from pathlib import Path
 
 import chess
 import chess.pgn
@@ -40,13 +39,12 @@ from tqdm import tqdm
 from pilot import (
     CACHE, OUT, GAMES_PATH,
     AGGRESSION_THRESHOLD, MIN_PROPENSITY,
-    GROUP_A_FEATURES, GROUP_B_FEATURES,
     CONCEPT_FEATURES, CONTEXT_FEATURES, S_FEATURES,
     board_to_planes, concepts, aggression_score,
     _safe_int, _make_propensity_model,
     MIN_PLY, MAX_PLY, POSITION_SAMPLE_PER_GAME,
 )
-from primary import fit_learned_Z, dr_ate, t_learner_ate
+from primary import fit_learned_Z, t_learner_ate
 
 ABLATION_DECISIONS = CACHE / "decisions_with_result.parquet"
 ABLATION_RESULTS = OUT / "ablation_game_outcome.csv"

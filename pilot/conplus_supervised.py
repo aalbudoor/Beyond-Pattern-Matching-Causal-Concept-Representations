@@ -28,7 +28,6 @@ import argparse
 import csv
 import time
 from dataclasses import dataclass, fields
-from pathlib import Path
 
 import matplotlib
 matplotlib.use("Agg")
@@ -37,7 +36,6 @@ import matplotlib.ticker as mticker
 import numpy as np
 import pandas as pd
 from sklearn.cross_decomposition import PLSRegression
-from sklearn.decomposition import PCA  # noqa: F401
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
 from tqdm import tqdm

@@ -28,7 +28,6 @@ import argparse
 import csv
 import time
 from dataclasses import dataclass, fields
-from pathlib import Path
 
 import matplotlib
 matplotlib.use("Agg")

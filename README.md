@@ -1,291 +1,97 @@
-# Beyond Pattern Matching: Causal Concept Representations
+# Beyond Pattern Matching: Causal Concept Representations for Strategic Decision-Making in Chess
 
-Course project for **ML808 — Causality & Machine Learning** at **MBZUAI**.
+Course project for **ML808: Causality & Machine Learning** at MBZUAI.
 
 **Authors:** Abdulla Alfalasi, Mohammed AlBalooshi
 
-## Project Summary
+**Paper:** [paper/main.pdf](paper/main.pdf)
 
-This repository contains a two-environment semi-synthetic causal testbed for strategic decision-making. The core question is whether expert-defined, human-interpretable concepts form a more sample-efficient adjustment basis for ATE estimation than:
+## Summary
 
-- raw high-dimensional state encodings
-- a learned low-dimensional deconfounding embedding
+This repository contains **ChessCausalBench**, a semi-synthetic causal testbed for strategic decision-making, and every experiment behind the paper. The testbed fixes a structural causal model with a planted average treatment effect and adjustable confounding strength `gamma`. It then asks which covariate encoding gives the most accurate doubly robust ATE estimate for the same back-door adjustment problem:
 
-Two environments instantiate the same SCM/DGP protocol:
+| Representation | Adjustment set | Dimension |
+| --- | --- | --- |
+| Raw | `X_raw = (S, X)`: bitboard state plus context | 1152 + 6 |
+| Concept | `X_concept = (C, X)`: expert chess concepts plus context | 12 + 6 |
+| Learned | `X_learned = (Z, X)`: linear deconfounding embedding plus context | 32 + 6 |
 
-1. **Chess** (primary) — 1152-dimensional bitboard states, 12 expert chess concepts, rule-based aggressive-vs-conservative treatment, semi-synthetic outcome grounded in structural board features.
-2. **Structured Gridworld** (secondary) — 10×10 grid with obstacles and a goal, 300-dimensional one-hot state, 3 expert concepts (distance-to-goal, obstacle density, quadrant), sigmoid-based treatment including a hidden checkerboard confounder that raw `S` can recover but `C` cannot.
+Two environments use the same SCM/DGP protocol:
 
-In each environment the project compares three covariate encodings of the same back-door adjustment problem:
+1. **Chess** (primary): about 30k decision points from rated classical Lichess games. The treatment is a rule-based aggressive-vs-conservative label, and the outcome is semi-synthetic, built from structural board features.
+2. **Gridworld** (secondary): a 10×10 grid with obstacles and a goal. A hidden checkerboard confounder is recoverable from raw `S` but absent from the concepts `C`.
 
-1. `X_raw = (S, X)` — raw state encoding plus context
-2. `X_concept = (C, X)` — expert concept vector plus context
-3. `X_learned = (Z, X)` — learned linear deconfounding embedding plus context
+## Main findings
 
-The estimand is the ATE of a binary strategic treatment under a semi-synthetic DGP with planted ground-truth effects.
+- Concept representations win at small `N` under non-trivial confounding, mainly because the outcome model is easier to fit.
+- Raw representations overtake at large `N` once the concept basis's sufficiency gap dominates. The crossover appears in both environments.
+- Concept adjustment is stable when the outcome model is swapped (LightGBM to Ridge); raw bias rises by 58%.
+- The learned linear embedding improves overlap but has chance-level outcome R², so it lands between the other two.
+- Replacing the engine-derived outcome with the actual game result keeps the concept advantage (SE ratio raw/concept of 7.6 at `N = 1000`), so the advantage is not an oracle-correlation artifact.
+- Adding a PCA residual of `S` to the concepts does not help; a treatment-supervised PLS residual helps in the mid-range only.
 
-## Current Status
+## Repository layout
 
-This repo is no longer at the proposal/pilot stage. The following are complete and committed:
-
-- pilot run: `24` rows in [pilot/outputs/pilot_results.csv](pilot/outputs/pilot_results.csv)
-- full primary grid: `2700` rows in [pilot/outputs/primary_results.csv](pilot/outputs/primary_results.csv)
-- phase-1 v2 analyses:
-  - [pilot/outputs/t3_threshold.csv](pilot/outputs/t3_threshold.csv)
-  - [pilot/outputs/bias_variance.csv](pilot/outputs/bias_variance.csv)
-  - [pilot/outputs/regime_diagram.csv](pilot/outputs/regime_diagram.csv)
-  - [pilot/outputs/crossover.csv](pilot/outputs/crossover.csv)
-- concept queries: `210` rows in [pilot/outputs/concept_queries.csv](pilot/outputs/concept_queries.csv)
-- residual augmentation:
-  - PCA residual baseline in [pilot/outputs/conplus_results.csv](pilot/outputs/conplus_results.csv)
-  - supervised T-PLS residual variant in [pilot/outputs/conplus_supervised_results.csv](pilot/outputs/conplus_supervised_results.csv)
-- nuisance diagnostics: `150` rows in [pilot/outputs/nuisance_diagnostics.csv](pilot/outputs/nuisance_diagnostics.csv)
-- gridworld secondary environment: `900` rows in [pilot/outputs/gridworld_results.csv](pilot/outputs/gridworld_results.csv)
-- NeurIPS-format manuscript source in [neurips.tex](neurips.tex) and compiled PDF in [neurips.pdf](neurips.pdf)
-
-## Main Findings Snapshot
-
-The committed results support the following broad picture:
-
-- **Concept representations win at small `N`** because they make nuisance estimation easier.
-- **Raw representations can overtake at large `N`** when the expert concept basis is only approximately sufficient.
-- **The learned linear embedding is mixed**: it improves overlap but can be weak on outcome fit.
-- **PCA residual augmentation fails** to close the large-`N` gap.
-- **T-supervised residual compression helps** in the mid-range but does not fully recover raw's asymptotic advantage.
-- **The gridworld checkerboard fix creates a real raw-vs-concept crossover**, though the final tuned version is stronger than the original target regime.
-
-For the detailed handoff on the two follow-up findings, see [docs/finding_1_2_summary_report.md](docs/finding_1_2_summary_report.md).
-
-## Manuscript Files
-
-- [neurips.tex](neurips.tex): primary manuscript source going forward
-- [neurips.pdf](neurips.pdf): compiled NeurIPS-format PDF
-- [archive/main.tex](archive/main.tex): legacy manuscript source retained for history
-- [neurips_2026.sty](neurips_2026.sty): official NeurIPS style file committed locally
-- [paper/template/](paper/template/): archived NeurIPS template bundle
-
-## Build the Paper
-
-The tested compile path in this repo is `tectonic`, not raw `pdflatex`.
-
-```bash
-conda activate chess-pilot
-tectonic neurips.tex
+```text
+.
+├── paper/
+│   ├── main.tex                   Manuscript source
+│   ├── main.pdf                   Compiled manuscript
+│   ├── refs.bib                   Bibliography
+│   └── neurips_2026.sty           NeurIPS 2026 style file
+├── pilot/
+│   ├── pilot.py                   Data pipeline (Lichess download, feature extraction) and pilot grid
+│   ├── primary.py                 Full chess grid (2,700 fits)
+│   ├── plan_v2_analysis.py        Sample-efficiency, bias-variance, regime, and crossover analyses
+│   ├── concept_queries.py         Concept-level CATE / conditional ATE queries
+│   ├── conplus.py                 PCA residual augmentation
+│   ├── conplus_supervised.py      T-supervised PLS residual augmentation
+│   ├── nuisance_diagnostics.py    Propensity AUC and outcome R² diagnostics
+│   ├── ablation_game_outcome.py   Game-outcome (oracle-correlation) ablation
+│   ├── plot_figures.py            Main figures
+│   ├── gridworld/                 Secondary environment
+│   ├── cache/                     Cached games and decision tables
+│   ├── outputs/                   Result CSVs and figures
+│   └── requirements.txt
+└── docs/
+    ├── experimental_notes.md      Original experimental design
+    ├── experimental_plan_v2.md    Extension plan
+    └── finding_1_2_summary_report.md  Notes on residual augmentation and the gridworld confounder
 ```
 
-Equivalent one-shot command:
-
-```bash
-conda run -n chess-pilot tectonic neurips.tex
-```
-
-This writes `neurips.pdf`.
-
-## Environment Setup
-
-Tested Python environment:
+## Setup
 
 ```bash
 conda create -n chess-pilot python=3.11
 conda activate chess-pilot
 pip install -r pilot/requirements.txt
-conda install -c conda-forge tectonic
 ```
 
-Important note:
+## Reproducing the results
 
-- use `conda run -n chess-pilot python ...`
-- do **not** rely on `conda run -n chess-pilot python3 ...` on this machine, because `python3` may resolve to Homebrew Python instead of the Conda env interpreter
+Caches, result CSVs, and figures are committed, so every number in the paper can be checked without rerunning anything. To regenerate them, run from `pilot/`:
 
-## Repository Layout
+| Step | Command | Writes |
+| --- | --- | --- |
+| Pilot and data pipeline | `python pilot.py` (`--refetch` to re-download, `--rebuild` to re-extract) | `outputs/pilot_results.csv` |
+| Primary chess grid | `python primary.py` (resumable; `--dry-run` to preview) | `outputs/primary_results.csv` |
+| Analyses | `python plan_v2_analysis.py` | `t3_threshold.csv`, `bias_variance.csv`, `regime_diagram.csv`, `crossover.csv`, figures |
+| Concept queries | `python concept_queries.py --force` | `concept_queries.csv`, `figQ_concept_queries.pdf` |
+| Residual augmentation | `python conplus.py`, then `python conplus_supervised.py` | `conplus_*results.csv`, `figConplus.pdf` |
+| Nuisance diagnostics | `python nuisance_diagnostics.py` | `nuisance_diagnostics.csv`, `figNuisance.pdf` |
+| Game-outcome ablation | `python ablation_game_outcome.py` | `ablation_game_outcome.csv` |
+| Main figures | `python plot_figures.py` (after the primary grid and ablation) | `outputs/figures/fig2`–`fig6` |
+| Gridworld | `python gridworld/runner.py --rebuild-pool` | `gridworld_results.csv`, `figGridworld.pdf` |
 
-```text
-.
-├── neurips.tex                    NeurIPS manuscript source
-├── neurips.pdf                    Compiled NeurIPS manuscript
-├── neurips_2026.sty               NeurIPS style file used by neurips.tex
-├── archive/
-│   └── main.tex                   Legacy manuscript source
-├── docs/
-│   ├── experimental_notes.md      Original locked setup
-│   ├── experimental_plan_v2.md    v2 extension plan
-│   └── finding_1_2_summary_report.md  Handoff note for Findings 1 and 2
-├── paper/
-│   └── template/                  Archived NeurIPS template bundle
-├── refs.bib                       Bibliography
-├── pilot/
-│   ├── pilot.py                   Minimum pilot runner
-│   ├── primary.py                 Full chess grid runner
-│   ├── plan_v2_analysis.py        T3 / bias-variance / regime / crossover analyses
-│   ├── concept_queries.py         Concept-level CATE / conditional ATE queries
-│   ├── conplus.py                 PCA residual augmentation
-│   ├── conplus_supervised.py      T-supervised PLS residual augmentation
-│   ├── nuisance_diagnostics.py    Propensity AUC / outcome R² diagnostics
-│   ├── ablation_game_outcome.py   Oracle-correlation sanity check
-│   ├── plot_figures.py            Figure generation
-│   ├── gridworld/                 Secondary environment
-│   ├── cache/                     Chess caches committed in this snapshot
-│   └── outputs/                   Result CSVs and figures committed in this snapshot
-└── README.md                      This file
-```
+All runners use seeds 0–9. Hyperparameters and seeding are listed in the paper's reproducibility appendix. The full chess grid takes about 2 hours on a laptop CPU; every other grid finishes in under 30 minutes.
 
-## Core Experimental Design
+Use `conda run -n chess-pilot python ...` rather than `python3`, which may resolve to a system interpreter.
 
-### Treatment
-
-`T` is a rule-based binary label for aggressive vs. conservative moves. It is built from captures, checks, king-zone pressure, sacrifices, and related move features. Engine evaluations are explicitly excluded from treatment assignment.
-
-### Outcome
-
-`Y` is semi-synthetic with a planted ground-truth treatment effect. The DGP is anchored in pre-treatment context and structural board features. Stockfish total evaluation is not used in the outcome path.
-
-### Causal Framing
-
-The concept vector `C = f(S)` is treated as a deterministic encoding of the raw board state `S`, not a separate causal parent. The project studies which covariate basis gives the best adjustment behavior under the same underlying SCM.
-
-## Reproduce the Experiments
-
-All runners live in [pilot/](pilot/).
-
-### 1. Pilot
+## Building the paper
 
 ```bash
-cd pilot
-python pilot.py
+cd paper
+latexmk -pdf main.tex      # or: tectonic main.tex
 ```
 
-Useful flags:
-
-```bash
-python pilot.py --refetch
-python pilot.py --rebuild
-```
-
-Writes [pilot/outputs/pilot_results.csv](pilot/outputs/pilot_results.csv).
-
-### 2. Full Primary Chess Grid
-
-```bash
-cd pilot
-python primary.py --dry-run
-python primary.py
-```
-
-Writes [pilot/outputs/primary_results.csv](pilot/outputs/primary_results.csv). The runner is resumable.
-
-### 3. v2 Analysis Pass
-
-```bash
-cd pilot
-python plan_v2_analysis.py
-```
-
-Writes:
-
-- [pilot/outputs/t3_threshold.csv](pilot/outputs/t3_threshold.csv)
-- [pilot/outputs/bias_variance.csv](pilot/outputs/bias_variance.csv)
-- [pilot/outputs/regime_diagram.csv](pilot/outputs/regime_diagram.csv)
-- [pilot/outputs/crossover.csv](pilot/outputs/crossover.csv)
-
-and figures:
-
-- [pilot/outputs/figures/figT3.pdf](pilot/outputs/figures/figT3.pdf)
-- [pilot/outputs/figures/figBV.pdf](pilot/outputs/figures/figBV.pdf)
-- [pilot/outputs/figures/figRegime.pdf](pilot/outputs/figures/figRegime.pdf)
-- [pilot/outputs/figures/figCross.pdf](pilot/outputs/figures/figCross.pdf)
-
-### 4. Concept Queries
-
-```bash
-cd pilot
-python concept_queries.py --force
-```
-
-Writes [pilot/outputs/concept_queries.csv](pilot/outputs/concept_queries.csv) and [pilot/outputs/figures/figQ_concept_queries.pdf](pilot/outputs/figures/figQ_concept_queries.pdf).
-
-### 5. Residual Augmentation
-
-PCA residual baseline:
-
-```bash
-cd pilot
-python conplus.py
-```
-
-Supervised T-PLS residual variant:
-
-```bash
-cd pilot
-python conplus_supervised.py
-```
-
-Writes:
-
-- [pilot/outputs/conplus_results.csv](pilot/outputs/conplus_results.csv)
-- [pilot/outputs/conplus_supervised_results.csv](pilot/outputs/conplus_supervised_results.csv)
-- [pilot/outputs/figures/figConplus.pdf](pilot/outputs/figures/figConplus.pdf)
-
-### 6. Nuisance Diagnostics
-
-```bash
-cd pilot
-python nuisance_diagnostics.py
-```
-
-Writes [pilot/outputs/nuisance_diagnostics.csv](pilot/outputs/nuisance_diagnostics.csv) and [pilot/outputs/figures/figNuisance.pdf](pilot/outputs/figures/figNuisance.pdf).
-
-### 7. Gridworld Secondary Environment
-
-```bash
-cd pilot
-python gridworld/runner.py --rebuild-pool
-```
-
-Writes:
-
-- [pilot/gridworld/cache/gridworld_pool.parquet](pilot/gridworld/cache/gridworld_pool.parquet)
-- [pilot/outputs/gridworld_results.csv](pilot/outputs/gridworld_results.csv)
-- [pilot/outputs/figures/figGridworld.pdf](pilot/outputs/figures/figGridworld.pdf)
-
-## Committed Artifacts
-
-This repository currently includes a committed snapshot of:
-
-- chess caches in `pilot/cache/`
-- gridworld cache in `pilot/gridworld/cache/`
-- result CSVs in `pilot/outputs/`
-- figure PDFs in `pilot/outputs/figures/`
-
-That snapshot is intended to make the manuscript and empirical claims inspectable without rerunning the full experiment suite.
-
-## Notes on the Two Follow-up Findings
-
-### Finding 1: Supervised Residual Compression
-
-- PCA residual augmentation is a negative result.
-- T-supervised PLS residual augmentation improves on concept in the mid-range.
-- It does **not** fully close the asymptotic raw gap.
-
-Primary files:
-
-- [pilot/conplus.py](pilot/conplus.py)
-- [pilot/conplus_supervised.py](pilot/conplus_supervised.py)
-- [pilot/outputs/conplus_results.csv](pilot/outputs/conplus_results.csv)
-- [pilot/outputs/conplus_supervised_results.csv](pilot/outputs/conplus_supervised_results.csv)
-
-### Finding 2: Gridworld Checkerboard Fix
-
-- Gridworld now includes an `S`-only hidden checkerboard confounder.
-- The final checked-in coefficients are stronger than the originally requested ones.
-- The result is a genuine raw-vs-concept crossover, but more aggressive than the target regime sketch.
-
-Primary files:
-
-- [pilot/gridworld/features.py](pilot/gridworld/features.py)
-- [pilot/gridworld/treatment.py](pilot/gridworld/treatment.py)
-- [pilot/gridworld/dgp.py](pilot/gridworld/dgp.py)
-- [pilot/outputs/gridworld_results.csv](pilot/outputs/gridworld_results.csv)
-
-## Citation
-
-If you reference this work, cite the manuscript in [neurips.tex](neurips.tex).
+Figures are read from `pilot/outputs/figures/`.

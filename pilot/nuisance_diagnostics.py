@@ -19,7 +19,6 @@ from __future__ import annotations
 import argparse
 import csv
 from dataclasses import dataclass, fields
-from pathlib import Path
 
 import matplotlib
 matplotlib.use("Agg")

@@ -28,28 +28,28 @@ The requested interpretation was:
 
 ### Code Changes
 
-Baseline PCA variant already existed in [pilot/conplus.py](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/conplus.py:106). That file still defines the original residual pipeline:
+Baseline PCA variant already existed in [pilot/conplus.py](../pilot/conplus.py). That file still defines the original residual pipeline:
 
 - regress `S` on `C`
 - take the residual
 - compress with PCA
 - adjust on `[C, PCA residual, context]`
 
-The new supervised variant was added in [pilot/conplus_supervised.py](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/conplus_supervised.py:110).
+The new supervised variant was added in [pilot/conplus_supervised.py](../pilot/conplus_supervised.py).
 
 Key implementation details:
 
-- `fit_conplus_tpls(...)` was added at [pilot/conplus_supervised.py](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/conplus_supervised.py:110)
+- `fit_conplus_tpls(...)` was added at [pilot/conplus_supervised.py](../pilot/conplus_supervised.py)
 - it regresses `S` on `C`, standardizes the residual, then fits `PLSRegression` against observed `T`
-- the runner writes `rep="conplus_tpls"` and saves to [pilot/outputs/conplus_supervised_results.csv](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/outputs/conplus_supervised_results.csv)
-- the plotting path was extended so [figConplus.pdf](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/outputs/figures/figConplus.pdf) now overlays:
+- the runner writes `rep="conplus_tpls"` and saves to [pilot/outputs/conplus_supervised_results.csv](../pilot/outputs/conplus_supervised_results.csv)
+- the plotting path was extended so [figConplus.pdf](../pilot/outputs/figures/figConplus.pdf) now overlays:
   - `raw`
   - `concept`
   - `learned`
-  - PCA residual (`conplus_pca`, loaded from [pilot/outputs/conplus_results.csv](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/outputs/conplus_results.csv))
-  - T-PLS residual (`conplus_tpls`, loaded from [pilot/outputs/conplus_supervised_results.csv](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/outputs/conplus_supervised_results.csv))
+  - PCA residual (`conplus_pca`, loaded from [pilot/outputs/conplus_results.csv](../pilot/outputs/conplus_results.csv))
+  - T-PLS residual (`conplus_tpls`, loaded from [pilot/outputs/conplus_supervised_results.csv](../pilot/outputs/conplus_supervised_results.csv))
 
-Paper text for this finding was added in [neurips.tex](../neurips.tex).
+Paper text for this finding was added in [paper/main.tex](../paper/main.tex).
 
 ### What Was Run
 
@@ -66,17 +66,17 @@ Important environment note:
 
 The run completed successfully and wrote:
 
-- [pilot/outputs/conplus_supervised_results.csv](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/outputs/conplus_supervised_results.csv) with 100 result rows
-- [pilot/outputs/figures/figConplus.pdf](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/outputs/figures/figConplus.pdf)
+- [pilot/outputs/conplus_supervised_results.csv](../pilot/outputs/conplus_supervised_results.csv) with 100 result rows
+- [pilot/outputs/figures/figConplus.pdf](../pilot/outputs/figures/figConplus.pdf)
 
 The runner is resume-safe: rerunning `--dry-run` reported `done = 100; remaining = 0`.
 
 ### Results
 
-The comparison uses the homogeneous-`tau*`, DR-Learner, LightGBM slice from [pilot/outputs/primary_results.csv](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/outputs/primary_results.csv), plus the two residual result files:
+The comparison uses the homogeneous-`tau*`, DR-Learner, LightGBM slice from [pilot/outputs/primary_results.csv](../pilot/outputs/primary_results.csv), plus the two residual result files:
 
-- [pilot/outputs/conplus_results.csv](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/outputs/conplus_results.csv)
-- [pilot/outputs/conplus_supervised_results.csv](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/outputs/conplus_supervised_results.csv)
+- [pilot/outputs/conplus_results.csv](../pilot/outputs/conplus_results.csv)
+- [pilot/outputs/conplus_supervised_results.csv](../pilot/outputs/conplus_supervised_results.csv)
 
 Median ATE bias highlights:
 
@@ -161,18 +161,18 @@ where `(r, c)` are the agent cell coordinates.
 
 The implementation touched three gridworld data-generation files:
 
-- [pilot/gridworld/features.py](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/gridworld/features.py:58)
-- [pilot/gridworld/treatment.py](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/gridworld/treatment.py:24)
-- [pilot/gridworld/dgp.py](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/gridworld/dgp.py:23)
+- [pilot/gridworld/features.py](../pilot/gridworld/features.py)
+- [pilot/gridworld/treatment.py](../pilot/gridworld/treatment.py)
+- [pilot/gridworld/dgp.py](../pilot/gridworld/dgp.py)
 
 Specific changes:
 
-- [pilot/gridworld/features.py](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/gridworld/features.py:58) now adds `hidden_checker` to each cached row
+- [pilot/gridworld/features.py](../pilot/gridworld/features.py) now adds `hidden_checker` to each cached row
 - `hidden_checker` was **not** added to `CONCEPT_FEATURES` or `CONTEXT_FEATURES`; it remains outside the concept adjustment set
-- [pilot/gridworld/treatment.py](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/gridworld/treatment.py:32) now includes a checker term in the treatment score
-- [pilot/gridworld/dgp.py](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/gridworld/dgp.py:42) now includes a checker term in `psi`
+- [pilot/gridworld/treatment.py](../pilot/gridworld/treatment.py) now includes a checker term in the treatment score
+- [pilot/gridworld/dgp.py](../pilot/gridworld/dgp.py) now includes a checker term in `psi`
 
-Paper text was updated in [neurips.tex](../neurips.tex).
+Paper text was updated in [paper/main.tex](../paper/main.tex).
 
 ### Important Deviation From the Initial Requested Coefficients
 
@@ -185,12 +185,12 @@ Those settings were implemented first, but they did **not** produce the desired 
 
 The **final locked-in setting** that was actually rerun and left in code is:
 
-- treatment checker coefficient: `+1.0` in [pilot/gridworld/treatment.py](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/gridworld/treatment.py:38)
-- outcome checker coefficient: `+0.5` in [pilot/gridworld/dgp.py](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/gridworld/dgp.py:45)
+- treatment checker coefficient: `+1.0` in [pilot/gridworld/treatment.py](../pilot/gridworld/treatment.py)
+- outcome checker coefficient: `+0.5` in [pilot/gridworld/dgp.py](../pilot/gridworld/dgp.py)
 
 This means the paper text was also updated to reflect the stronger final DGP:
 
-- [neurips.tex](../neurips.tex) now says the outcome DGP adds a `$0.5\\,\\chi$` term
+- [paper/main.tex](../paper/main.tex) now says the outcome DGP adds a `$0.5\\,\\chi$` term
 
 ### What Was Run
 
@@ -207,13 +207,13 @@ The rerun completed successfully:
 
 Artifacts written:
 
-- rebuilt pool: [pilot/gridworld/cache/gridworld_pool.parquet](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/gridworld/cache/gridworld_pool.parquet)
-- results: [pilot/outputs/gridworld_results.csv](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/outputs/gridworld_results.csv)
-- figure: [pilot/outputs/figures/figGridworld.pdf](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/outputs/figures/figGridworld.pdf)
+- rebuilt pool: [pilot/gridworld/cache/gridworld_pool.parquet](../pilot/gridworld/cache/gridworld_pool.parquet)
+- results: [pilot/outputs/gridworld_results.csv](../pilot/outputs/gridworld_results.csv)
+- figure: [pilot/outputs/figures/figGridworld.pdf](../pilot/outputs/figures/figGridworld.pdf)
 
 ### Results
 
-The key summary below uses the `dr + lgbm` slice of [pilot/outputs/gridworld_results.csv](/Users/abdullaalbudoor/Desktop/Beyond_Pattern_Matching__Causal_Concept_Representations_for_Strategic_Decision_Making_in_Chess/pilot/outputs/gridworld_results.csv), because that is the directly comparable regime panel.
+The key summary below uses the `dr + lgbm` slice of [pilot/outputs/gridworld_results.csv](../pilot/outputs/gridworld_results.csv), because that is the directly comparable regime panel.
 
 Winner-by-cell pattern:
 
